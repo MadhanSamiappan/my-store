@@ -184,6 +184,8 @@ class FacetFiltersForm extends HTMLElement {
       sortFilterForms.forEach((form) => {
         if (!isMobile) {
           if (form.id === 'FacetSortForm' || form.id === 'FacetFiltersForm' || form.id === 'FacetSortDrawerForm') {
+            const noJsElements = document.querySelectorAll('.no-js-list');
+            noJsElements.forEach((el) => el.remove());
             forms.push(this.createSearchParams(form));
           }
         } else if (form.id === 'FacetFiltersFormMobile') {
@@ -211,84 +213,15 @@ FacetFiltersForm.setListeners();
 class PriceRange extends HTMLElement {
   constructor() {
     super();
-    console.log(this);
-    this.min = Number(this.dataset.min);
-		this.max = Number(this.dataset.max);
-    this.track = this.querySelector(".price-range__track");
-		this.handles = [...this.querySelectorAll(".price-range__thumbs")];
-		this.startPos = 0;
-		this.activeHandle;
-		
-		this.handles.forEach(handle => {
-			handle.addEventListener("mousedown", this.startMove.bind(this));
-		})
-		
-		window.addEventListener("mouseup", this.stopMove.bind(this));
-
-    this.querySelectorAll('input').forEach(
-      element => element.addEventListener('change', this.onRangeChange.bind(this))
-    );
-	}
+    this.querySelectorAll('input')
+      .forEach(element => element.addEventListener('change', this.onRangeChange.bind(this)));
+    this.setMinAndMaxValues();
+  }
 
   onRangeChange(event) {
     this.adjustToValidValues(event.currentTarget);
     this.setMinAndMaxValues();
   }
-	
-	startMove(e) {
-		this.startPos = e.offsetX;
-		this.activeHandle = e.target;
-		this.moveListener = this.move.bind(this);
-		window.addEventListener("mousemove", this.moveListener);
-	}
-	
-	move(e) {
-		const isLower = this.activeHandle.classList.contains("is-lower");
-		const property = isLower ? "--progress-lower" : "--progress-upper";
-		const parentRect = this.track.getBoundingClientRect();
-		const handleRect = this.activeHandle.getBoundingClientRect();
-		let newX = e.clientX - parentRect.x - this.startPos;
-		
-    if (isLower) {
-			const otherX = parseInt(this.style.getPropertyValue("--progress-upper"));
-      const percentageX = otherX * parentRect.width / 100;
-			newX = Math.min(newX, percentageX - handleRect.width);
-			newX = Math.max(newX, 0 - handleRect.width/2);
-		}
-    else {
-			const otherX = parseInt(this.style.getPropertyValue("--progress-lower"));
-      const percentageX = otherX * parentRect.width / 100;
-			newX = Math.max(newX, percentageX);
-			newX = Math.min(newX, parentRect.width - handleRect.width/2);
-		}
-
-    const percentage = (newX + handleRect.width/2) / parentRect.width;
-    const valuenow = this.calcHandleValue(percentage);
-    this.style.setProperty(property, percentage * 100 + "%");
-		this.activeHandle.ariaValueNow = valuenow;
-
-    const output = this.activeHandle.nextElementSibling;
-    const text = output.querySelector('.price-range__output-text');
-    text.innerHTML = valuenow;
-
-    const inputs = this.querySelectorAll('input');
-    const input = isLower ? inputs[0] : inputs[1];
-    input.value = valuenow;
-    
-    this.adjustToValidValues(input);
-    this.setMinAndMaxValues();
-	}
-	
-	calcHandleValue(percentage) {
-		return Math.round(percentage * (this.max - this.min) + this.min);
-	}
-	
-	stopMove() {
-		window.removeEventListener("mousemove", this.moveListener);
-    const form = this.closest('form');
-    
-    if (this.activeHandle && form) form.dispatchEvent(new Event('input'));
-	}
 
   setMinAndMaxValues() {
     const inputs = this.querySelectorAll('input');
@@ -309,6 +242,7 @@ class PriceRange extends HTMLElement {
     if (value > max) input.value = max;
   }
 }
+
 customElements.define('price-range', PriceRange);
 
 class FacetRemove extends HTMLElement {

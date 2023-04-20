@@ -1,0 +1,209 @@
+{{ 'confetti.css' | file_url | stylesheet_tag }}
+{{ 'comingsoon.css' | asset_url | stylesheet_tag }}
+{{ 'TweenMax.min.js' | asset_url | script_tag }}
+<canvas class="confetti" id="canvas"></canvas>
+
+<div class="stage">
+  <svg id="demo" xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+<defs>
+<lineargradient id="theGradient" gradientUnits="userSpaceOnUse" x1="200" y1="0" x2="200" y2="400">
+  <stop offset="0%" stop-color="#000000"/>
+  <stop offset="25%" stop-color="#fff"/>
+  <stop offset="75%" stop-color="#fff"/>
+  <stop offset="100%" stop-color="#000000"/>
+</lineargradient>
+<mask id="theMask">
+  <rect x="0" y="0" width="400" height="400" fill="url(#theGradient)" />  
+</mask>
+</defs> 
+  
+<rect x="0" y="0" width="400" height="400" fill="#000" />
+<g mask="url(#theMask)"> 
+  <rect x="0" y="0" width="400" height="400" fill="#444" />
+  <line x1="2" y1="0" x2="2" y2="400" stroke-width="4" stroke="#fff"/>
+  <line x1="398" y1="0" x2="398" y2="400" stroke-width="4" stroke="#fff"/>
+  <text id="node0" transform="translate(200 300)" text-anchor="middle" font-size="320" fill="#fff">9</text>
+  <text id="node1" transform="translate(200 -100)" text-anchor="middle" font-size="320" fill="#fff">9</text>
+</g>
+</svg>
+</div>
+<div class="credits">
+  <p>Another exciting GreenSock forum answer demo from PointC</p>
+</div>
+
+<script>
+  //-----------Var Inits--------------
+  canvas = document.getElementById("canvas");
+  ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  cx = ctx.canvas.width / 2;
+  cy = ctx.canvas.height / 2;
+  
+  let confetti = [];
+  const confettiCount = 600;
+  const gravity = 0.4;
+  const terminalVelocity = 5;
+  const drag = 0.075;
+  const colors = [
+  { front: 'red', back: 'darkred' },
+  { front: 'green', back: 'darkgreen' },
+  { front: 'blue', back: 'darkblue' },
+  { front: 'yellow', back: 'darkyellow' },
+  { front: 'orange', back: 'darkorange' },
+  { front: 'pink', back: 'darkpink' },
+  { front: 'purple', back: 'darkpurple' },
+  { front: 'turquoise', back: 'darkturquoise' }];
+  
+  
+  //-----------Functions--------------
+  resizeCanvas = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    cx = ctx.canvas.width / 2;
+    cy = ctx.canvas.height / 2;
+  };
+  
+  randomRange = (min, max) => Math.random() * (max - min) + min;
+  
+  initConfetti = () => {
+    for (let i = 0; i < confettiCount; i++) {
+      confetti.push({
+        color: colors[Math.floor(randomRange(0, colors.length))],
+        dimensions: {
+          x: randomRange(10, 20),
+          y: randomRange(10, 30) },
+  
+        position: {
+          x: randomRange(0, canvas.width),
+          y: canvas.height - 1 },
+  
+        rotation: randomRange(0, 2 * Math.PI),
+        scale: {
+          x: 0.5,
+          y: 0.5 },
+  
+        velocity: {
+          x: randomRange(-25, 25),
+          y: randomRange(0, -50) } });
+  
+  
+    }
+  };
+  
+  //---------Render-----------
+  render = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+    confetti.forEach((confetto, index) => {
+      let width = confetto.dimensions.x * confetto.scale.x;
+      let height = confetto.dimensions.y * confetto.scale.y;
+  
+      // Move canvas to position and rotate
+      ctx.translate(confetto.position.x, confetto.position.y);
+      ctx.rotate(confetto.rotation);
+  
+      // Apply forces to velocity
+      confetto.velocity.x -= confetto.velocity.x * drag;
+      confetto.velocity.y = Math.min(confetto.velocity.y + gravity, terminalVelocity);
+      confetto.velocity.x += Math.random() > 0.5 ? Math.random() : -Math.random();
+  
+      // Set position
+      confetto.position.x += confetto.velocity.x;
+      confetto.position.y += confetto.velocity.y;
+  
+      // Delete confetti when out of frame
+      if (confetto.position.y >= canvas.height) confetti.splice(index, 1);
+  
+      // Loop confetto x position
+      if (confetto.position.x > canvas.width) confetto.position.x = 0;
+      if (confetto.position.x < 0) confetto.position.x = canvas.width;
+  
+      // Spin confetto by scaling y
+      confetto.scale.y = Math.cos(confetto.position.y * 0.1);
+      ctx.fillStyle = confetto.scale.y > 0 ? confetto.color.front : confetto.color.back;
+  
+      // Draw confetti
+      ctx.fillRect(-width / 2, -height / 2, width, height);
+  
+      // Reset transform matrix
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+    });
+  
+    // Fire off another round of confetti
+    if (confetti.length <= 10) initConfetti();
+  
+    window.requestAnimationFrame(render);
+  };
+  
+  //---------Execution--------
+  initConfetti();
+  // render();
+  
+  //----------Resize----------
+  window.addEventListener('resize', function () {
+    resizeCanvas();
+  });
+  
+  //------------Click------------
+  window.addEventListener('click', function () {
+    initConfetti();
+  });
+
+ //timer
+var counter = 9;
+var n0 = document.querySelector("#node0");
+var n1 = document.querySelector("#node1");
+
+function countDown() {
+  if (counter > 0) {
+    counter--;
+  } else {
+    counter = 9;
+  }
+  n1.textContent = counter;
+  TweenMax.to("#node0, #node1", 0.9, {
+    y: "+=400",
+    delay: 0.25,
+    ease: Power3.easeInOut,
+    onComplete: swapNodes
+  });
+}
+
+function swapNodes() {
+  n0.textContent = counter;
+  TweenMax.set("#node0, #node1", { y: "-=400", onComplete: countDown });
+}
+
+countDown();
+
+
+  
+  function startTimer() {
+    // clearInterval(timerInterval);
+    render();
+    setTimeout(()=>{window.location.reload()},2000);
+  }
+
+
+          
+  let checklive = setInterval(() => {
+    fetch('/?view=golive').then(res => res.json()).then(value => {
+      if (value.make_live) {
+        clearInterval(checklive);
+        console.log('interval cleared')
+        startTimer();
+      } else {
+        console.log('not live yet')
+      }
+    })
+  }, 2000)
+
+</script>
+
+{% schema %}
+  {
+    "name": "Coming Soon",
+    "settings": []
+  }
+{% endschema %}

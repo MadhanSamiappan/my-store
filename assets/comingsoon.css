@@ -1,0 +1,70 @@
+.confetti {
+  width: 100%;
+  display: block;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  user-select: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+}
+
+/* Timer CSS */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  background: steelblue;
+  color: white;
+  font-family: "Roboto", sans-serif;
+}
+
+.stage {
+  display: flex;
+  align-content: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+#demo {
+
+  max-height: 82%;
+  max-width: 96%;
+  font-weight: 700;
+}
+
+.credits {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 150px;
+  width: 100%;
+  background: url("https://assets.codepen.io/314556/demoAvatar.png")
+    20px bottom no-repeat;
+  background-size: contain;
+  z-index: 8;
+}
+
+.credits p {
+  position: absolute;
+  bottom: 0;
+  left: 100px;
+  line-height: 1.5;
+  margin: 0;
+  font-size: 0.875em;
+  color: rgba(255, 255, 255, 0.35);
+}
